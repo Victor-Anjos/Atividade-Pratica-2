@@ -1,0 +1,178 @@
+<!--
+* Curso de Engenharia de Software - UniEVANGÉLICA 
+* Disciplina de Programação Web 
+* Dev: Victor César Lopes dos Anjos 
+* DATA: 09/05/2024
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>To-Do List</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+
+    <style>
+      /* Estilo do corpo da página */
+      body {
+        font-family: Arial, sans-serif; /* Define a família da fonte */
+        display: flex; /* Usa flexbox para layout */
+        justify-content: center; /* Centraliza horizontalmente */
+        align-items: flex-start; /* Alinha ao topo */
+        min-height: 100vh; /* Garante que o corpo ocupe toda a altura da tela */
+        margin: 0; /* Remove margens padrão */
+      }
+
+      /* Estilo do contêiner principal */
+      #app {
+        text-align: left; /* Alinha o texto à esquerda */
+        margin-top: 50px; /* Adiciona margem superior */
+        background-color: #f4f4f4; /* Define a cor de fundo */
+        padding: 20px; /* Adiciona preenchimento */
+      }
+
+      /* Estilo do contêiner de entrada */
+      .input-container {
+        margin-bottom: 10px; /* Adiciona margem inferior */
+        display: flex; /* Usa flexbox para layout */
+        align-items: center; /* Alinha itens verticalmente */
+        justify-content: flex-start; /* Alinha itens ao início */
+      }
+
+      /* Estilo da lista de tarefas */
+      .task-list {
+        list-style-type: none; /* Remove a estilização da lista */
+        padding: 0; /* Remove o preenchimento padrão */
+      }
+
+      /* Estilo do contêiner de cada tarefa */
+      .task-container {
+        background-color: #fff; /* Define a cor de fundo */
+        padding: 10px; /* Adiciona preenchimento */
+        border-radius: 4px; /* Adiciona borda arredondada */
+        margin-bottom: 5px; /* Adiciona margem inferior */
+        display: flex; /* Usa flexbox para layout */
+        align-items: center; /* Alinha itens verticalmente */
+        justify-content: space-between; /* Distribui itens horizontalmente */
+      }
+
+      /* Estilo do contêiner de tarefa concluída */
+      .completed-task-container {
+        background-color: #d4edda; /* Define a cor de fundo para tarefas concluídas */
+      }
+
+      /* Estilo do nome da tarefa concluída */
+      .task.completed span {
+        text-decoration: line-through; /* Adiciona decoração de texto riscado */
+        color: #888; /* Define a cor do texto */
+      }
+
+      /* Estilo do nome da tarefa */
+      .task-name {
+        flex-grow: 1; /* Faz com que o nome da tarefa ocupe o espaço disponível */
+        font-size: 18px; /* Define o tamanho da fonte */
+      }
+
+      /* Estilo dos botões */
+      .add-button,
+      .complete-button,
+      .remove-button {
+        color: white; /* Define a cor do texto */
+        padding: 10px 15px; /* Adiciona preenchimento */
+        margin-left: 5px; /* Adiciona margem à esquerda */
+        font-size: 16px; /* Define o tamanho da fonte */
+        border: none; /* Remove a borda */
+        cursor: pointer; /* Define o cursor como ponteiro */
+        transition: background-color 0.3s; /* Adiciona transição suave */
+        border-radius: 4px; /* Adiciona borda arredondada */
+      }
+
+      /* Estilo do botão de adicionar */
+      .add-button {
+        background-color: #4a90e2; /* Define a cor de fundo */
+      }
+
+      /* Estilo do botão de completar */
+      .complete-button {
+        background-color: #8bc34a; /* Define a cor de fundo */
+      }
+
+      /* Estilo do botão de remover */
+      .remove-button {
+        background-color: #f44336; /* Define a cor de fundo */
+      }
+
+      /* Estilo do campo de entrada de texto */
+      input[type="text"] {
+        padding: 10px; /* Adiciona preenchimento */
+        font-size: 16px; /* Define o tamanho da fonte */
+        border: 1px solid #ccc; /* Adiciona uma borda sólida */
+        border-radius: 4px; /* Adiciona borda arredondada */
+        margin-right: 10px; /* Adiciona margem à direita */
+        flex-grow: 1; /* Faz com que o campo de entrada ocupe o espaço disponível */
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Container principal -->
+    <div id="app">
+      <h1>To-Do List</h1>
+      <!-- Título da lista de tarefas -->
+      <!-- Container para adicionar nova tarefa -->
+      <div class="input-container">
+        <input type="text" v-model="newTask" placeholder="Nova tarefa" />
+        <!-- Campo de entrada para nova tarefa -->
+        <button class="add-button" @click="addTask">Adicionar</button>
+        <!-- Botão para adicionar tarefa -->
+      </div>
+      <!-- Lista de tarefas -->
+      <div class="task-list">
+        <div
+          v-for="(task, index) in tasks"
+          :key="index"
+          :class="['task-container', { 'completed-task-container': task.completed }]"
+        >
+          <!-- Nome da tarefa -->
+          <span class="task-name">{{ task.name }}</span>
+          <!-- Botão para completar a tarefa -->
+          <button class="complete-button" @click="toggleTaskCompletion(index)">
+            {{ task.completed ? 'Desfazer' : 'Concluir' }}
+          </button>
+          <!-- Botão para remover a tarefa -->
+          <button class="remove-button" @click="removeTask(index)">
+            Remover
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* Script Vue.js para a funcionalidade da lista de tarefas */
+      new Vue({
+        el: "#app", // Define o elemento Vue
+        data: {
+          newTask: "", // Armazena a nova tarefa digitada
+          tasks: [], // Armazena a lista de tarefas
+        },
+        methods: {
+          addTask() {
+            // Método para adicionar uma nova tarefa
+            if (this.newTask.trim() !== "") {
+              this.tasks.push({ name: this.newTask, completed: false }); // Adiciona a nova tarefa à lista de tarefas
+              this.newTask = ""; // Limpa o campo de entrada após adicionar a tarefa
+            }
+          },
+          removeTask(index) {
+            // Método para remover uma tarefa
+            this.tasks.splice(index, 1); // Remove a tarefa da lista de tarefas
+          },
+          toggleTaskCompletion(index) {
+            // Método para alternar a conclusão de uma tarefa
+            this.tasks[index].completed = !this.tasks[index].completed; // Inverte o estado de conclusão da tarefa
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
